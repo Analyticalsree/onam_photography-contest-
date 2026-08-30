@@ -19,22 +19,24 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-# Set the runner-level environment variable to bypass the Node deprecation check across all steps
+# Global environment variables to handle Node.js runtime transitions across all action steps
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out the repository
+      # Step 1: Check out the repository code
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js (Node 20)
+      # Step 2: Set up Node.js environment
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -59,7 +61,7 @@ jobs:
         with:
           path: './dist'
 
-      # Step 7: Deploy artifact to GitHub Pages
+      # Step 7: Deploy the artifact to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
