@@ -15,31 +15,31 @@ permissions:
   id-token: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
+# Set the runner-level environment variable to bypass the Node deprecation check across all steps
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out the repository code
+      # Step 1: Check out the repository
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js environment
+      # Step 2: Set up Node.js (Node 20)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
 
       # Step 3: Install project dependencies
       - name: Install dependencies
@@ -59,7 +59,7 @@ jobs:
         with:
           path: './dist'
 
-      # Step 7: Deploy the artifact to GitHub Pages
+      # Step 7: Deploy artifact to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
